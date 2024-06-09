@@ -1,4 +1,5 @@
 #include <bits/stdc++.h>
+#include <cstdio>
 using namespace std;
 
 class Aggregator{
@@ -22,6 +23,7 @@ bool readAggregator(){
      string fileName="";
      string fileContent="";
     while(getline(aggregate,currentLine)){
+        if(currentLine.empty())continue;
         //cout<<currentLine<<endl;
         if(currentLine.size()>3 && currentLine[0]=='~' && currentLine[1]=='~'){
             for(int i=2;i<currentLine.size();i++){
@@ -66,7 +68,6 @@ if(!aggregate.is_open()){
     cout<<"Error opening Aggregate file !"<<endl;
     return false;
 }
-if(aggregate.tellg()!=0 || aggregate.tellp()!=0)
     aggregate<<"\n";
 //adding file name ~~ + FileName
 aggregate<<("~~"+fileToWriteName+"\n");
@@ -75,11 +76,64 @@ while(getline(fileToWrite,currLine)){
     fileContent = fileContent+currLine+"\n";
     aggregate<<(currLine+"\n");
 }
-aggregate<<"~~~\n";
+aggregate<<"~~~";
 aggregate.close();
 allFiles.push_back({fileToWriteName,fileContent});
+//  if (remove(fileToWriteName.c_str()) != 0) {
+//     perror("Error removing the file");
+//     } 
 return true;
 }
+
+
+bool removeFile(string fileToRemoveName){
+    fstream cutFile;
+    cutFile.open("cut_File.txt",ios::out);
+    string fileContent="";
+    for(int i=0;i<allFiles.size();i++){
+        if(allFiles[i].first==fileToRemoveName){
+            fileContent=allFiles[i].second;
+            allFiles.erase(allFiles.begin()+i);
+            break;
+        }
+    }
+
+    cutFile<<fileContent;
+
+    aggregate.open("aggregator.txt",ios::out);
+    for(auto it:allFiles){
+        aggregate<<"~~"<<it.first<<"\n";
+        aggregate<<it.second;
+        aggregate<<"\n~~~\n";
+    }
+
+    aggregate.close();
+    return true;
+}
+
+bool copyFile(string fileToCopyName){
+     fstream copyFile;
+    copyFile.open("copy_File.txt",ios::out);
+    string fileContent="";
+    for(int i=0;i<allFiles.size();i++){
+        if(allFiles[i].first==fileToCopyName){
+            fileContent=allFiles[i].second;
+            break;
+        }
+    }
+    copyFile<<fileContent;
+    return true;
+}
+
+void displayFile(string fileToDisplay){
+    for(auto it:allFiles){
+        if(it.first==fileToDisplay){
+            cout<<"FileName :"<<it.first<<endl;
+            cout<<it.second<<endl;
+        }
+    }
+}
+
 
 };
 
