@@ -1,0 +1,37 @@
+1. Aggregate Me
+------------------------------------------------------------------------
+GOAL: Create a simple file aggregator. It takes a list of files and clubs them into a single file while keeping track of individual files.
+
+DETAILS: Your task is to write a program that takes a series of files and adds them to a single file. It should be able to add, remove, rename, and move files dynamically. Write a command-line program that accepts a series of command-argument pairs and performs the task specified by the command.
+
+COMMANDS:
+
+Add a new file (add file.txt)
+
+Adds file.txt to aggregator.txt and deletes the original file.txt.
+Remove a file (cut file.txt)
+
+Removes file.txt from aggregator.txt and creates a separate file cut_file.txt with the same content as the original file.txt.
+List all files (list)
+
+Lists all the files present in aggregator.txt.
+Create a copy of a file (copy file.txt)
+
+Keeps file.txt in aggregator.txt and creates a copy of the original file.txt as copy_file.txt.
+Rename a file (rename old_file.txt new_file.txt)
+
+Renames old_file.txt to new_file.txt within aggregator.txt.
+Move a file (move file.txt new_location)
+
+Moves file.txt to a new location (new_location), keeping a reference in aggregator.txt.
+Display content of a file (display file.txt)
+
+Displays the content of file.txt from aggregator.txt.
+FILES TO SUBMIT:
+
+Source code file.
+Snapshots of the terminal showing the flow of different scenarios.
+NOTES:
+
+All metadata required to perform these operations should also be stored in aggregator.txt.
+You can safely assume that you only have text files.
