@@ -13,17 +13,21 @@ void codeDriver(vector<string> &params)
     {
       executed=agg.removeFile(params[1]);
     }
+    else if (operation == "listAllFiles") 
+    {
+        executed=agg.listAllFiles();
+    }
     else if (operation == "copyFile")
     {
         executed = agg.copyFile(params[1]);
     }
     else if (operation == "renameFile")
     {
-        cout<<"Still under implementation"<<endl;
+        executed=agg.renameFile(params[1], params[2]);
     }
     else if (operation == "moveFile")
     {
-        executed = agg.moveFile(params[1],params[2]);
+        executed = agg.moveFile(params[1], params[2]);
     }
     else if (operation == "displayFile")
     {

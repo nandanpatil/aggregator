@@ -134,6 +134,13 @@ public:
         return true;
     }
 
+    bool listAllFiles() {
+        for (int i = 0; i < allFiles.size(); i++) {
+            cout<<(i + 1)<<". "<<allFiles[i].first<<endl;
+        }
+        return true;
+    }
+
     bool copyFile(string fileToCopyName)
     {
         fstream copyFile;
@@ -148,6 +155,27 @@ public:
             }
         }
         copyFile << fileContent;
+        return true;
+    }
+
+    bool renameFile(string oldName, string newName) 
+    {
+        for(int i = 0; i < allFiles.size(); i++) 
+        {
+            if (allFiles[i].first == oldName) {
+                allFiles[i].first = newName;
+            }
+        }
+
+        aggregate.open("aggregator.txt", ios::out);
+        for (auto it : allFiles)
+        {
+            aggregate << "~~" << it.first << "\n";
+            aggregate << it.second;
+            aggregate << "\n~~~\n";
+        }
+
+        aggregate.close();
         return true;
     }
 
