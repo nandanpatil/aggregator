@@ -1,17 +1,60 @@
 #include "aggregate.h"
 
-int main(){
+void codeDriver(vector<string> &params)
+{
     Aggregator agg;
-    agg.readAggregator();
-    // agg.printAllFiles();
-    cout<<"============================="<<endl;
-    // agg.addFile("text0.txt");
-    // agg.addFile("text1.txt");
-    // agg.addFile("text2.txt");
-    // agg.addFile("text3.txt");
-    //  agg.addFile("text4.txt");
-    // agg.copyFile("text3.txt");
-    agg.displayFile("text3.txt");
-    // agg.printAllFiles();
+    string operation = params[0];
+     bool executed=false;
+    if (operation == "addFile")
+    {
+      executed= agg.addFile(params[1]);
+    }
+    else if (operation == "removeFile")
+    {
+      executed=agg.removeFile(params[1]);
+    }
+    else if (operation == "copyFile")
+    {
+        executed = agg.copyFile(params[1]);
+    }
+    else if (operation == "renameFile")
+    {
+        cout<<"Still under implementation"<<endl;
+    }
+    else if (operation == "moveFile")
+    {
+        executed = agg.moveFile(params[1],params[2]);
+    }
+    else if (operation == "displayFile")
+    {
+        executed = agg.displayFile(params[1]);
+    }
+    else
+    {
+        cout << "Command does not exist.\n";
+        cout << "Help -> ./aggregator -{functionName} {fileName} {fileName(only required for moving file)}\n";
+        cout << "Functions available :\n";
+        /*#*/ cout << "addFile {fileName} :Adds file.txt to aggregator.txt and deletes the original_file.txt." << endl;
+        /*#*/ cout << "removeFile {fileName} :Removes file.txt from aggregator.txt and creates a separate file cut_file.txt with the same content as the original file.txt\n";
+        /*#*/ cout << "copyFile {fileName} :Keeps file.txt in aggregator.txt and creates a copy of the original file.txt as copy_file.txt." << endl;
+        /*#*/ cout << "renameFile :Renames old_file.txt to new_file.txt within aggregator.txt.\n";
+        /*#*/ cout << "moveFile {fileName} :Moves file.txt to a new location (new_location), keeping a reference in aggregator.txt.\n";
+        /*#*/ cout << "displayFile {fileName} :Displays the content of file.txt from aggregator.txt.\n";
+        return;
+    }
+    if(!executed)cout<<"Please check the file and try again"<<endl;
+}
 
+
+
+int main(int argc, char *argv[])
+{
+    vector<string> params;
+    for (int i = 1; i <= argc; i++)
+    {
+        if (argv[i])
+            params.push_back(argv[i]);
+    }
+
+    codeDriver(params);
 }
