@@ -1,27 +1,28 @@
-#include <bits/stdc++.h>
-#include <cstdio>
-#include <cstring>
-#include <dirent.h>
-#include <unistd.h>
-#include <sys/stat.h>
-#include <iostream>
-#include <cstdio>  // For std::remove
-#include <cstring> // For std::strerror
+#include <bits/stdc++.h> // Includes most standard C++ library headers
+#include <cstdio>        // Standard C library for input/output operations
+#include <cstring>       // Standard C library for string manipulation
+#include <dirent.h>      // POSIX library for directory operations
+#include <unistd.h>      // POSIX library for standard symbolic constants and types
+#include <sys/stat.h>    // POSIX library for file status
+#include <iostream>      // Standard C++ library for input/output stream
+#include <cstdio>        // For std::remove, included again (duplicate include)
+#include <cstring>       // For std::strerror, included again (duplicate include)
 #if defined(_WIN32)
-#include <io.h> // For _access, _unlink
+#include <io.h> // Windows library for low-level I/O operations
 #else
+#include <errno.h> // POSIX library for error numbers
 #endif
-#include <errno.h>
 using namespace std;
 
 class Aggregator
 {
-    // fileName, fileContent
+    // Stores pairs of file names and their content
     vector<pair<string, string>> allFiles;
-    // aggregate file pointer
+    // File stream for the aggregate file
     fstream aggregate;
 
 public:
+    // Constructor: initializes the aggregator and reads existing data from "aggregator.txt"
     Aggregator()
     {
         aggregate.open("aggregator.txt", ios::in);
@@ -36,11 +37,12 @@ public:
         string currentLine = "";
         string fileName = "";
         string fileContent = "";
+        // Read each line of the aggregate file
         while (getline(aggregate, currentLine))
         {
             if (currentLine.empty())
                 continue;
-            // cout<<currentLine<<endl;
+            // Detect the start of a new file entry
             if (currentLine.size() > 3 && currentLine[0] == '~' && currentLine[1] == '~')
             {
                 for (int i = 2; i < currentLine.size(); i++)
@@ -48,6 +50,7 @@ public:
                     fileName += currentLine[i];
                 }
             }
+            // Detect the end of a file entry
             else if (currentLine.size() == 3 && currentLine == "~~~")
             {
                 allFiles.push_back({fileName, fileContent});
@@ -62,7 +65,7 @@ public:
         aggregate.close();
         return true;
     }
-
+    // Prints all files stored in allFiles
     void printAllFiles()
     {
         for (int i = 0; i < allFiles.size(); i++)
@@ -105,13 +108,15 @@ public:
         return true;
     }
 
+    // removes file from aggregator.txt and creates new file with same content
     bool removeFile(string fileToRemoveName)
     {
         fstream cutFile;
-        cutFile.open("cut_File.txt", ios::out);
+        cutFile.open(fileToRemoveName.substr(0,fileToRemoveName.size()-4) + "_cutFile.txt", ios::out);
         string fileContent = "";
         for (int i = 0; i < allFiles.size(); i++)
         {
+            // finding the required file
             if (allFiles[i].first == fileToRemoveName)
             {
                 fileContent = allFiles[i].second;
@@ -120,8 +125,10 @@ public:
             }
         }
 
+        // writing the text into new file
         cutFile << fileContent;
 
+        // rewriting aggregator.txt without the specified file
         aggregate.open("aggregator.txt", ios::out);
         for (auto it : allFiles)
         {
@@ -134,10 +141,20 @@ public:
         return true;
     }
 
+    bool listAllFiles()
+    {
+        for (int i = 0; i < allFiles.size(); i++)
+        {
+            cout << (i + 1) << ". " << allFiles[i].first << endl;
+        }
+        return true;
+    }
+
+    // copy the content of specific file into copy_file.txt using content in aggregator.txt
     bool copyFile(string fileToCopyName)
     {
         fstream copyFile;
-        copyFile.open("copy_File.txt", ios::out);
+        copyFile.open(fileToCopyName.substr(0,fileToCopyName.size()-4) + "_copyFile.txt", ios::out);
         string fileContent = "";
         for (int i = 0; i < allFiles.size(); i++)
         {
@@ -151,6 +168,32 @@ public:
         return true;
     }
 
+    // renames the file within aggregator.txt
+    bool renameFile(string oldName, string newName)
+    {
+        for (int i = 0; i < allFiles.size(); i++)
+        {
+            // replacing old name with new name
+            if (allFiles[i].first == oldName)
+            {
+                allFiles[i].first = newName;
+            }
+        }
+
+        // rewriting new aggregator.txt
+        aggregate.open("aggregator.txt", ios::out);
+        for (auto it : allFiles)
+        {
+            aggregate << "~~" << it.first << "\n";
+            aggregate << it.second;
+            aggregate << "\n~~~\n";
+        }
+
+        aggregate.close();
+        return true;
+    }
+
+    // Retrieves the content of a specific file
     bool displayFile(string fileToDisplay)
     {
         for (auto it : allFiles)
@@ -165,6 +208,7 @@ public:
         return false;
     }
 
+    // Moves a file to a new location
     bool moveFile(string fileToMoveName, string newLocationOfFile)
     {
         const string sourceFile = fileToMoveName;
@@ -174,7 +218,7 @@ public:
         if (access(sourceFile.c_str(), F_OK) == -1)
         {
             cerr << "Source file does not exist.\n";
-            return 1;
+            return 0;
         }
 
         // Create the target directory if it does not exist
@@ -182,21 +226,20 @@ public:
         if (mkdir(targetDir.c_str()) == -1 && errno != EEXIST)
         {
             cerr << "Failed to create directory: " << std::strerror(errno) << '\n';
-            return 1;
+            return 0;
         }
 
-        // Move the file
         newLocation += fileToMoveName;
+        // Move the file
         if (rename(sourceFile.c_str(), newLocation.c_str()) == -1)
         {
             cerr << "Failed to move file: " << std::strerror(errno) << '\n';
-            return 1;
+            return 0;
         }
-
-        cout << "File moved successfully to " << newLocation << "\n";
-        return 0;
+        return 1;
     }
 
+    // Deletes a file
     bool deleteFile(string fileToDeleteName)
     {
         const char *fileToDelete = fileToDeleteName.c_str();
@@ -210,7 +253,7 @@ public:
         {
 #endif
             cerr << "File does not exist.\n";
-            return 1;
+            return 0;
         }
 
         // Delete the file
@@ -222,10 +265,9 @@ public:
         {
 #endif
             cerr << "Failed to delete file: " << strerror(errno) << '\n';
-            return 1;
+            return 0;
         }
 
-        cout << "File deleted successfully.\n";
-        return 0;
+        return 1;
     }
 };
