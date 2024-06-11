@@ -140,7 +140,7 @@ public:
         aggregate.close();
         return true;
     }
-
+    
     bool listAllFiles()
     {
         for (int i = 0; i < allFiles.size(); i++)
@@ -167,7 +167,7 @@ public:
         copyFile << fileContent;
         return true;
     }
-
+    
     // renames the file within aggregator.txt
     bool renameFile(string oldName, string newName)
     {
